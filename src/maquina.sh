@@ -1,4 +1,6 @@
 #!/bin/bash
+
+
 jogada_maquina(){
     pilhas=($@)
 
@@ -19,5 +21,4 @@ jogada_maquina(){
     pilhas[$pilha_escolhida]=$((pilhas[$pilha_escolhida] - pecas_remover))
 
     echo "A máquina escolheu a pilha $((pilha_escolhida + 1)) e retirou $pecas_remover peça(s)."
-    echo "Pilhas após a jogada da máquina: ${pilhas[@]}"    
 }

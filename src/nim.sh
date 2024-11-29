@@ -1,83 +1,60 @@
 #!/bin/bash
 
-
-# Chama o arquivo torneio.sh
 source ./src/torneio.sh
 
-# Inicializa as variáveis globais
-pilhas=(3 4 5)
-jogador=1
+jogador1=0
+jogador2=0
+partida=0
+battle=0
 
-# Função para exibir o estado atual das pilhas
-mostrar_pilhas() {
-    echo "Pilha 1: ${pilhas[0]}"
-    echo "Pilha 2: ${pilhas[1]}"
-    echo "Pilha 3: ${pilhas[2]}"
-}
 
-# Função para checar de quem é a vez de jogar
-jogador_da_vez(){
+escolher_partida() {
+    while true; do
+        echo "Escolha o tipo de partida que deseja jogar!"
+        echo "1 - Amistosa (1 partida)"
+        echo "2 - Torneio (melhor de 3)"
+        read type
+        partida=$type
 
-    mostrar_pilhas
-
-    
-    if [ $jogador -eq 1 ] || [ $jogador -eq 2];then
-        # Jogador 
-        echo "Jogador $1, escolha uma pilha (1, 2 ou 3):"
-        read pilha
-
-        # Verifica se a pilha escolhida é válida
-        if [ $pilha -lt 1 ] || [ $pilha -gt 3 ]; then
-            echo "Pilha inválida! Escolha entre 1, 2 ou 3."
-            return 1
+        if [ "$type" -ge 1 ] && [ "$type" -le 2 ]; then
+            break
+        else
+            echo "Digite um tipo de partida válido!"
         fi
+    done
+}
+escolher_jogadores() {
+    while true; do
+        echo "Deseja jogar contra a Máquina ou contra um 2º jogador?"
+        echo "1 - Contra a Máquina"
+        echo "2 - Contra um 2º jogador"
+        read type
+        battle=$type
 
-        echo "Quantos objetos você quer remover da pilha $pilha?"
-        read quantidade
-
-
-        # Verifica se a quantidade a remover é válida
-        if [ ${pilhas[$pilha-1]} -lt $quantidade ]; then
-            echo "Não há objetos suficientes na pilha $pilha!"
-            return 1
+        if [ $type -eq 1 ]; then
+            jogador1="Você"
+            jogador2="Máquina"
+            break
+        elif [ $type -eq 2 ]; then
+            read -p "Digite o nome do Jogador 1: " jogador1
+            read -p "Digite o nome do Jogador 2: " jogador2
+            break
+        else
+            echo "Digite um valor válido!"
+            continue
         fi
-    fi
-
-    # Remove objetos da pilha escolhida
-    pilhas[$pilha-1]=$((pilhas[$pilha-1] - quantidade))
-
-    echo "Palitos retirados: $quantidade"
-    return 0
+    done
 }
 
-# Função para verificar se o jogo terminou
-jogo_terminado() {
-    if [ ${pilhas[0]} -eq 0 ] && [ ${pilhas[1]} -eq 0 ] && [ ${pilhas[2]} -eq 0 ]; then
-        return 0
+menu(){
+    escolher_partida
+    escolher_jogadores
+
+    if [ "$partida" -eq 1 ]; then
+        jogar_amistoso "$battle" "$jogador1" "$jogador2"
     else
-        return 1
+        jogar_torneio "$battle" "$jogador1" "$jogador2"
     fi
 }
 
-# Loop principal do jogo
-while true; do
-    
-
-    jogador_da_vez $jogador
-    resultado=$?
-    if [ $resultado -eq 1 ];then
-        echo "Erro! escolha uma pilha ou quantidade certa!"
-        continue
-    fi
-    if jogo_terminado; then
-        echo "Jogador $jogador perdeu! Não há mais objetos nas pilhas."
-        break
-    fi
-    if [ $jogador -eq 1 ];then 
-        jogador=2
-    else
-        jogador=1
-    fi
-
-    jogador_da_vez
-done
+menu
